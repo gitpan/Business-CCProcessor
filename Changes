@@ -1,5 +1,9 @@
 Revision history for Business-CCProcessor
 
+0.06  Fri Feb  2 12:11:25 2007
+	Added test suite's prerequisites 
+	to Build.PL and Makefil.PL
+
 0.05  Thu Feb 1 16:57:46 2007
 	Added documentation on how to configure verisign to
 	avoid invalid referral url errors, plus removed some

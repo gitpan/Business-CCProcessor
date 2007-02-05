@@ -13,6 +13,7 @@ WriteMakefile(
   'CGI::FormBuilder' => 0,
            'version' => 0,
               'Carp' => 0,
+  'Test::HTML::Tidy' => 0,
   'Test::HTML::Lint' => 0,
 'Test::Perl::Critic' => 0,
     },

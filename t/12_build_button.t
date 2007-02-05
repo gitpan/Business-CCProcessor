@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Test::More tests => 9;
 use Test::HTML::Lint;
-use Test::HTML::Tidy;
 use WWW::Mechanize;
 # my $agent = WWW::Mechanize->new();
 use lib qw{t};
@@ -13,15 +12,19 @@ my $agent = MyMech->new();
 use lib qw{lib};
 use Business::CCProcessor;
 
-my $tidy = HTML::Tidy->new();
-# $tidy->ignore( 'type' => 'TIDY_WARNING' );
-$tidy->ignore( 'text' => [ qr/<input> attribute "id"/, qr/<table> lacks "summary"/ ] );
-
+SKIP:
+{
+    eval 'use Test::HTML::Tidy';
+    skip('This test requires Test::HTML::Tidy, which is not available.',1) if $@;
+    my $tidy = HTML::Tidy->new();
+    # $tidy->ignore( 'type' => 'TIDY_WARNING' );
+    $tidy->ignore( 'text' => [ qr/<input> attribute "id"/, qr/<table> lacks "summary"/ ] );
+}
 my $cc = Business::CCProcessor->new();
 isa_ok($cc,'Business::CCProcessor', "Constructor returned correct object.");
 
-my ($form,$fields,%fields,$method,%data,$key,$html);
-my ($processor_settings);
+my ($form,$fields,%fields,$method,%data,$key);
+my ($processor_settings,$html);
 my $credit_card_owner = populate_credit_card_owner();
 
 foreach $method ('dia','paypal','verisign'){
@@ -47,11 +50,24 @@ EOHTML
 EOHTML
 
     html_ok($html,"This test rendered well formed html for \$cc->$method().");
+SKIP:
+{
+    eval 'use Test::HTML::Tidy';
+    if ($@) {
+      skip('This test requires Test::HTML::Tidy, which is not available.',1) 
+    }; 
+    my $tidy = HTML::Tidy->new();
     $tidy->clean( $html );
+}
 
 SKIP:
 {
-    skip("The html generated is not html_tidy compliant, yet.",1);
+    eval 'use Test::HTML::Tidy';
+    if (defined($@)) {
+      skip('This test requires Test::HTML::Tidy, which is not available.',1) 
+    } else {
+      skip("The html generated is not html_tidy compliant, yet.",1);
+    }
     html_tidy_ok($html);
 }
 
